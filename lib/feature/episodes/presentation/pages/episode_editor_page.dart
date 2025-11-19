@@ -24,49 +24,60 @@ class _EpisodeEpidorPageState extends State<EpisodeEpidorPage> {
   Future<void> _onSavePressed() async {
     final notifier = context.read<EpisodesEditorNotifier>();
 
-    final result = await notifier.saveEpisode();
+    await notifier.saveEpisode();
 
-    context.router.pop();
+    notifier.clear();
+    context.router.maybePop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<EpisodesEditorNotifier>(
       builder: (context, notifier, widget) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("New Episode"),
-            actions: [
-              IconButton(
-                onPressed: notifier.isSaving ? null : _onSavePressed,
-                icon: notifier.isSaving
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(),
-                      )
-                    : Icon(Icons.save),
-              ),
-            ],
-          ),
-          body: notifier.isLoading || notifier.backgroundBytes == null
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Center(
-                  child: AspectRatio(
-                    aspectRatio: 9 / 16,
-                    child: DrawingBoard(
-                      controller: notifier.drawingController,
-                      background: Image.memory(
-                        notifier.backgroundBytes!,
-                        fit: BoxFit.cover,
-                      ),
-                      showDefaultActions: true,
-                      showDefaultTools: true,
-                    ),
-                  ),
+        return PopScope(
+          onPopInvokedWithResult: (didPop, result) {
+            context.read<EpisodesEditorNotifier>().clear();
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("New Episode"),
+              actions: [
+                IconButton(
+                  onPressed: notifier.isSaving ? null : _onSavePressed,
+                  icon: notifier.isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(),
+                        )
+                      : Icon(Icons.save),
                 ),
+              ],
+            ),
+            body: notifier.isLoading || notifier.backgroundBytes == null
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      return DrawingBoard(
+                        controller: notifier.drawingController,
+                        background: SizedBox(
+                          width: constraints.maxWidth,
+                          height: constraints.maxHeight,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Image.memory(
+                              notifier.backgroundBytes!,
+                            ),
+                          ),
+                        ),
+                        showDefaultActions: true,
+                        showDefaultTools: true,
+                      );
+                    },
+                  ),
+          ),
         );
       },
     );
