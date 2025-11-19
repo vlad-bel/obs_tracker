@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_drawing_board/flutter_drawing_board.dart';
+import 'package:obs_tracker/core/failures/failure_snackbar.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_editor_notifier.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,10 @@ class _EpisodeEpidorPageState extends State<EpisodeEpidorPage> {
   Widget build(BuildContext context) {
     return Consumer<EpisodesEditorNotifier>(
       builder: (context, notifier, widget) {
+        if(notifier.failure != null){
+          showErrorSnackbar(error: notifier.failure, context: context);
+        }
+
         return PopScope(
           onPopInvokedWithResult: (didPop, result) {
             context.read<EpisodesEditorNotifier>().clear();

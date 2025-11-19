@@ -21,29 +21,37 @@ class EpisodesLocalDataSourceImpl implements EpisodesLocalDataSource {
 
   @override
   Future<List<Episode>> getEpisodes() async {
-    final file = await _getFile();
+    try {
+      final file = await _getFile();
 
-    if (!file.existsSync()) {
-      return [];
+      if (!file.existsSync()) {
+        return [];
+      }
+
+      final content = await file.readAsString();
+
+      if (content.isEmpty) {
+        return [];
+      }
+
+      final list = jsonDecode(content) as List;
+
+      return list.map((e) => Episode.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      rethrow;
     }
-
-    final content = await file.readAsString();
-
-    if (content.isEmpty) {
-      return [];
-    }
-
-    final list = jsonDecode(content) as List;
-
-    return list.map((e) => Episode.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<void> saveEpisodes(List<Episode> episodes) async {
-    final file = await _getFile();
+    try {
+      final file = await _getFile();
 
-    final jsonList = episodes.map((e)=> e.toJson()).toList();
+      final jsonList = episodes.map((e) => e.toJson()).toList();
 
-    await file.writeAsString(jsonEncode(jsonList));
+      await file.writeAsString(jsonEncode(jsonList));
+    } catch (e) {
+      rethrow;
+    }
   }
 }

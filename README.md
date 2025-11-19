@@ -1,16 +1,43 @@
 # obs_tracker
 
-A new Flutter project.
+## Описание
+Прототип приложения, которое подключается к Obs стриму,
+делает скриншоты, показывает реплай от/после сделанного скриншота.
 
-## Getting Started
+## Установка
 
-This project is a starting point for a Flutter application.
+### Obs studio
+1) Установите obs studio на ваш компьютер
+2) В tools -> "websocket server settings" включите "Enable Websocket server"
+3) Введите порт, задайте пароль
+4) В obs -> preferences -> output -> recording установите recording format: mp4
+5) В том же меню включите ReplyBuffer, задайте время реплая
+6) Задайте время реплая, например 60 секунд
+7) В obs -> preferences -> stream подключитесь к стриминговой платформе, например Twitch
+8) Запустите стрим, активируйте reply buffer в меню controls
 
-A few resources to get you started if this is your first Flutter project:
+### Приложение
+1) Приложение должно быть в той же локальной сети, что и хост obs studio
+2) Скачайте последнюю актуальную версию кода, ветка main
+3) В obs_tacker/assets/config/app_config.json задайте 
+    - obsWebSocketUrl - урл и порт вебсокета. 
+      - IOS Simulator/Destop/Web: ws://127.0.0.1:4455
+      - Android Emulator : ws://10.0.2.2:4455
+      - Реальное устройство в одной сети с пк: ws://<локальный IP ПК>:4455
+    - obsWebSocketPassowrd - пароль из obs studio
+    - replyBufferDuration - длина повтора, должна быть такой же как в Obs studio
+    - preWindow - длительность записи до скриншота
+    - postWindow - длительность записи после скриншота
+   
+4) Запустите проект:
+   - flutter pub get
+   - flutter pub run build_runner build 
+   - flutter run
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### TODO
+- Реализовать сохранение данных между стримами, сейчас
+если предыдущий стрим закрывается, данные из него стираются
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+

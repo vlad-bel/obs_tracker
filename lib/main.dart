@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:obs_tracker/core/app_config/app_config.dart';
 import 'package:obs_tracker/core/navigation/app_router.dart';
 import 'package:obs_tracker/feature/episodes/data/datasources/episodes_datasource.dart';
 import 'package:obs_tracker/feature/episodes/data/repositories/episodes_repository_impl.dart';
@@ -15,7 +15,12 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final obsWebSocket = await ObsWebSocket.connect('ws://127.0.0.1:4455', password: 'myStrongPassword1234@_');
+  final config = await AppConfig.load();
+
+  final obsWebSocket = await ObsWebSocket.connect(
+    config.obsWebSocketUrl,
+    password: config.obsWebSocketPassword,
+  );
 
   final episodesDs = EpisodesLocalDataSourceImpl();
   final episodesRepo = EpisodesRepositoryImpl(dataSource: episodesDs);
