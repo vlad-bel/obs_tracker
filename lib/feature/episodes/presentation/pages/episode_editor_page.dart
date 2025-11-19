@@ -4,6 +4,7 @@ import 'package:flutter_drawing_board/flutter_drawing_board.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_editor_notifier.dart';
 import 'package:provider/provider.dart';
 
+@RoutePage()
 class EpisodeEpidorPage extends StatefulWidget {
   const EpisodeEpidorPage({super.key});
 
@@ -15,7 +16,9 @@ class _EpisodeEpidorPageState extends State<EpisodeEpidorPage> {
   @override
   void initState() {
     super.initState();
-    context.read<EpisodesEditorNotifier>().loadScreenshot();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EpisodesEditorNotifier>().loadScreenshot();
+    });
   }
 
   Future<void> _onSavePressed() async {
@@ -52,7 +55,7 @@ class _EpisodeEpidorPageState extends State<EpisodeEpidorPage> {
                 )
               : Center(
                   child: AspectRatio(
-                    aspectRatio: 16 / 9,
+                    aspectRatio: 9 / 16,
                     child: DrawingBoard(
                       controller: notifier.drawingController,
                       background: Image.memory(

@@ -6,7 +6,8 @@ part of 'episode.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Episode _$EpisodeFromJson(Map<String, dynamic> json) => _Episode(
+_$EpisodeImpl _$$EpisodeImplFromJson(Map<String, dynamic> json) =>
+    _$EpisodeImpl(
       id: json['id'] as String,
       videoPath: json['videoPath'] as String,
       startOffset: const DurationMsConverter()
@@ -18,7 +19,8 @@ _Episode _$EpisodeFromJson(Map<String, dynamic> json) => _Episode(
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
-Map<String, dynamic> _$EpisodeToJson(_Episode instance) => <String, dynamic>{
+Map<String, dynamic> _$$EpisodeImplToJson(_$EpisodeImpl instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'videoPath': instance.videoPath,
       'startOffset': const DurationMsConverter().toJson(instance.startOffset),

@@ -1,24 +1,30 @@
 import 'dart:io';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:obs_tracker/feature/episodes/domain/entities/episode.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_player_notifier.dart';
 import 'package:provider/provider.dart';
 
-class EpisodePlayerPage extends StatefulWidget {
+@RoutePage()
+class EpisodePlayerPage extends StatelessWidget {
   final Episode episode;
 
-  const EpisodePlayerPage({
-    super.key,
-    required this.episode,
-  });
+  const EpisodePlayerPage({super.key, required this.episode});
 
   @override
-  State<EpisodePlayerPage> createState() => _EpisodePlayerPageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => EpisodesPlayerNotifier(
+        episode: episode,
+      ),
+      child: _EpisodePlayerView(),
+    );
+  }
 }
 
-class _EpisodePlayerPageState extends State<EpisodePlayerPage> {
+class _EpisodePlayerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<EpisodesPlayerNotifier>(

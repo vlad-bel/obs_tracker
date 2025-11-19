@@ -39,6 +39,7 @@ class EpisodesEditorNotifier extends ChangeNotifier {
     final screenshot = await obsRepository.takeScreenshot();
     _backgroundBytes = screenshot;
 
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -76,8 +77,8 @@ class EpisodesEditorNotifier extends ChangeNotifier {
   }
 
   Future<String> _saveScreenshotPng(Uint8List bytes) async {
-    final dir = getApplicationDocumentsDirectory();
-    final file = File("$dir/screenshot_${DateTime.now().millisecondsSinceEpoch}.png");
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File("${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png");
 
     await file.writeAsBytes(bytes);
 
