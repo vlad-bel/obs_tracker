@@ -1,8 +1,10 @@
-abstract interface class UseCase<T, P>{
-  Future<T>call(P p);
+import 'package:dartz/dartz.dart';
+import 'package:obs_tracker/core/failures/failures.dart';
+
+abstract interface class UseCase<T, P> {
+  Future<Either<Failure, T>> call(P p);
 }
 
-class NoParams{
+class NoParams {
   const NoParams();
 }
-

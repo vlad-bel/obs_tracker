@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:obs_tracker/core/failures/failures.dart';
 import 'package:obs_tracker/core/usecase/usecase.dart';
 import 'package:obs_tracker/feature/episodes/domain/entities/episode.dart';
 import 'package:obs_tracker/feature/episodes/domain/repositories/episodes_repository.dart';
@@ -26,7 +28,7 @@ class CreateEpisodeUsecase implements UseCase<Episode, CreateEpisodeParams> {
   const CreateEpisodeUsecase(this.repository);
 
   @override
-  Future<Episode> call(CreateEpisodeParams p) {
+  Future<Either<Failure, Episode>> call(CreateEpisodeParams p) {
 
     final episode = Episode(
       id: _uuid.v4(),

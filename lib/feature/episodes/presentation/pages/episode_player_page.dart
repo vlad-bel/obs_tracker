@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:obs_tracker/core/failures/failure_snackbar.dart';
 import 'package:obs_tracker/feature/episodes/domain/entities/episode.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_player_notifier.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +31,7 @@ class _EpisodePlayerView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<EpisodesPlayerNotifier>(
       builder: (context, notifier, widget) {
+
         if (!notifier.isReady || notifier.chewieController == null) {
           return Scaffold(
             body: Center(

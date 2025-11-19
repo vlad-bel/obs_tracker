@@ -1,12 +1,11 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
+import 'package:obs_tracker/core/failures/failures.dart';
 
 abstract interface class ObsRepository {
+  Future<Either<Failure, Duration>> getCurrentRecordPosition();
 
-  Future<Duration> getCurrentRecordPosition();
+  Future<Either<Failure, String>> saveReplayAndGetPath();
 
-  Future<String> getCurrentRecordFilePath();
-
-  Future<String> saveReplayAndGetPath();
-
-  Future<Uint8List> takeScreenshot();
+  Future<Either<Failure, Uint8List>> takeScreenshot();
 }

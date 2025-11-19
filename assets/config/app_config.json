@@ -1,0 +1,7 @@
+{
+  "obsWebSocketUrl": "ws://127.0.0.1:4455",
+  "obsWebSocketPassowrd": "myStrongPassword1234@_",
+  "replyBufferDuration": 60,
+  "prevWindow": 20,
+  "postWindow": 20
+}

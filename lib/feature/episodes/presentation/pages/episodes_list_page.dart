@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:obs_tracker/core/failures/failure_snackbar.dart';
 import 'package:obs_tracker/core/navigation/app_router.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_notifier.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,10 @@ class _EpisodesListPageState extends State<EpisodesListPage> {
   Widget build(BuildContext context) {
     return Consumer<EpisodesNotifier>(
       builder: (context, notifier, child) {
+        if (notifier.failure != null) {
+          showErrorSnackbar(error: notifier.failure, context: context);
+        }
+
         if (notifier.isLoading) {
           return Scaffold(
             body: Center(
