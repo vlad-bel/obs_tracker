@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:obs_tracker/feature/episodes/domain/entities/episode.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_player_notifier.dart';
 import 'package:provider/provider.dart';
+import 'package:photo_view/photo_view.dart';
 
 @RoutePage()
 class EpisodePlayerPage extends StatelessWidget {
@@ -49,9 +50,16 @@ class _EpisodePlayerView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Expanded(
-                child: Image.file(
-                  File(notifier.episode.screenshotPath),
-                  fit: BoxFit.cover,
+                child: PhotoView(
+                  imageProvider: FileImage(
+                    File(notifier.episode.screenshotPath),
+                  ),
+                  initialScale: PhotoViewComputedScale.contained,
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.contained * 10,
+                  backgroundDecoration: const BoxDecoration(
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ],

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_drawing_board/flutter_drawing_board.dart';
-import 'package:obs_tracker/feature/episodes/domain/entities/episode.dart';
 import 'package:obs_tracker/feature/episodes/domain/usecases/create_episode.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_notifier.dart';
 import 'package:obs_tracker/feature/obs/domain/obs_repository.dart';
@@ -21,16 +20,19 @@ class EpisodesEditorNotifier extends ChangeNotifier {
   final drawingController = DrawingController();
 
   Uint8List? _backgroundBytes;
-
   Uint8List? get backgroundBytes => _backgroundBytes;
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
 
   bool _isSaving = false;
-
   bool get isSaving => _isSaving;
+
+  static const replayDuration = Duration(seconds: 60);
+  static const preWindow = Duration(seconds: 10);
+  static const postWindow = Duration(seconds: 10);
+
+  DateTime? _screenshotTime;
 
   Future<void> loadScreenshot() async {
     _isLoading = true;
@@ -38,49 +40,78 @@ class EpisodesEditorNotifier extends ChangeNotifier {
 
     final screenshot = await obsRepository.takeScreenshot();
     _backgroundBytes = screenshot;
+    _screenshotTime = DateTime.now();
 
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<Episode> saveEpisode({
+  Future<void> clear() async {
+    drawingController.clear();
+    _backgroundBytes = null;
+  }
+
+  Future<void> saveEpisode({
     Duration pre = const Duration(seconds: 5),
     Duration post = const Duration(seconds: 5),
   }) async {
+    if (backgroundBytes == null) {
+      return;
+    }
+
     _isSaving = true;
     notifyListeners();
 
-    final currentPos = await obsRepository.getCurrentRecordPosition();
-    final videoPath = await obsRepository.getCurrentRecordFilePath();
+    final screenShotPath = await _saveDrawPng();
 
-    final jsonList = drawingController.getJsonList();
-    final drawingJson = jsonEncode(jsonList);
+    final drawingJson = jsonEncode(drawingController.getJsonList());
 
-    final imageData = await drawingController.getImageData();
-    final pngBytes = imageData?.buffer.asUint8List();
-    /// todo add error handling
-    final screenShotPath = await _saveScreenshotPng(pngBytes!);
+    final videoPath = await obsRepository.saveReplayAndGetPath();
 
-    final result = await episodesNotifier.addEpisode(CreateEpisodeParams(
+    final now = DateTime.now();
+    final delta = now.difference(_screenshotTime!);
+    var screenshotPos = replayDuration - delta;
+
+    if (screenshotPos < Duration.zero) {
+      screenshotPos = Duration.zero;
+    } else if (screenshotPos > replayDuration) {
+      screenshotPos = replayDuration;
+    }
+
+    var startOffset = screenshotPos - preWindow;
+    var endOffset = screenshotPos + postWindow;
+
+    if (startOffset < Duration.zero) {
+      startOffset = Duration.zero;
+    }
+    if (endOffset > replayDuration) {
+      endOffset = replayDuration;
+    }
+
+    if (endOffset <= startOffset) {
+      endOffset = startOffset + Duration(seconds: 1);
+    }
+
+    await episodesNotifier.addEpisode(CreateEpisodeParams(
       videoPath: videoPath,
-      currentPosition: currentPos,
-      preDuration: pre,
-      postDuration: post,
+      preDuration: startOffset,
+      postDuration: endOffset,
       screenshotPath: screenShotPath,
       drawingJson: drawingJson,
     ));
 
     _isSaving = false;
     notifyListeners();
-
-    return result;
   }
 
-  Future<String> _saveScreenshotPng(Uint8List bytes) async {
+  Future<String> _saveDrawPng() async{
+    final imageData = await drawingController.getImageData();
+    final bytes = imageData?.buffer.asUint8List();
+
     final dir = await getApplicationDocumentsDirectory();
     final file = File("${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png");
 
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes!);
 
     return file.path;
   }

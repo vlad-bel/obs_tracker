@@ -11,7 +11,6 @@ class ObsRepositoryImpl implements ObsRepository {
 
   ObsRepositoryImpl({required this.obs});
 
-
   @override
   Future<String> getCurrentRecordFilePath() async {
     final dirResp = await obs.sendRequest(Request("GetRecordStatus"));
@@ -23,11 +22,9 @@ class ObsRepositoryImpl implements ObsRepository {
 
   @override
   Future<Duration> getCurrentRecordPosition() async {
-    final status = await obs.sendRequest(Request("GetRecordStatus"));
+    final status = await obs.record.getRecordStatus();
 
-    final ms = status?.responseData?["outputDuration"] as int;
-
-    return Duration(milliseconds: ms);
+    return Duration(milliseconds: status.outputDuration);
   }
 
   @override
@@ -60,8 +57,12 @@ class ObsRepositoryImpl implements ObsRepository {
   }
 
   @override
-  Future<String> saveReplayAndGetPath() {
-    // TODO: implement saveReplayAndGetPath
-    throw UnimplementedError();
+  Future<String> saveReplayAndGetPath() async {
+    await obs.outputs.saveReplayBuffer("output");
+
+    final resp = await obs.send("GetLastReplayBufferReplay");
+    final path = resp?.responseData?["savedReplayPath"] as String;
+
+    return path;
   }
 }
