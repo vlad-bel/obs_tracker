@@ -43,3 +43,4 @@ class ObsRepositoryImpl implements ObsRepository {
     return base64Decode(base64Image);
   }
 }
+
