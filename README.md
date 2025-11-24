@@ -42,7 +42,3 @@ A prototype of an application that:
 ### TODO
 - Implement data saving between streams, now
   if the previous stream is closed, the data from it is erased
-
-
-
-
