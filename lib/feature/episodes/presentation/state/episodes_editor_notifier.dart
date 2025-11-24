@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_drawing_board/flutter_drawing_board.dart';
+import 'package:obs_tracker/core/app_config/app_config.dart';
 import 'package:obs_tracker/core/failures/failures.dart';
 import 'package:obs_tracker/feature/episodes/domain/usecases/create_episode.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_notifier.dart';
@@ -12,11 +13,17 @@ import 'package:path_provider/path_provider.dart';
 class EpisodesEditorNotifier extends ChangeNotifier {
   final ObsRepository obsRepository;
   final EpisodesNotifier episodesNotifier;
+  final AppConfig appConfig;
 
   EpisodesEditorNotifier({
     required this.obsRepository,
     required this.episodesNotifier,
-  });
+    required this.appConfig,
+  }) {
+    replayDuration = Duration(seconds: appConfig.replyBufferDuration);
+    preWindow = Duration(seconds: appConfig.prevWindow);
+    postWindow = Duration(seconds: appConfig.postWindow);
+  }
 
   final drawingController = DrawingController();
 
@@ -32,9 +39,10 @@ class EpisodesEditorNotifier extends ChangeNotifier {
 
   bool get isSaving => _isSaving;
 
-  static const replayDuration = Duration(seconds: 60);
-  static const preWindow = Duration(seconds: 10);
-  static const postWindow = Duration(seconds: 10);
+  late final Duration replayDuration;
+  late final Duration preWindow;
+
+  late final Duration postWindow;
 
   DateTime? _screenshotTime;
 

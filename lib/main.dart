@@ -8,6 +8,7 @@ import 'package:obs_tracker/feature/episodes/domain/usecases/get_episodes.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_editor_notifier.dart';
 import 'package:obs_tracker/feature/episodes/presentation/state/episodes_notifier.dart';
 import 'package:obs_tracker/feature/obs/data/obs_repository_impl.dart';
+import 'package:obs_tracker/feature/obs/data/obs_websocket_datasource.dart';
 import 'package:obs_tracker/feature/obs/domain/obs_repository.dart';
 import 'package:obs_websocket/obs_websocket.dart';
 import 'package:provider/provider.dart';
@@ -16,11 +17,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final config = await AppConfig.load();
-
-  final obsWebSocket = await ObsWebSocket.connect(
-    config.obsWebSocketUrl,
-    password: config.obsWebSocketPassword,
-  );
 
   final episodesDs = EpisodesLocalDataSourceImpl();
   final episodesRepo = EpisodesRepositoryImpl(dataSource: episodesDs);
@@ -34,7 +30,7 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<ObsRepository>(
-          create: (_) => ObsRepositoryImpl(obs: obsWebSocket),
+          create: (_) => ObsRepositoryImpl(obs: ObsWebsocketDatasource(appConfig: config)),
         ),
         ChangeNotifierProvider(
           create: (_) => EpisodesNotifier(
@@ -46,6 +42,7 @@ void main() async {
           create: (context) => EpisodesEditorNotifier(
             obsRepository: context.read<ObsRepository>(),
             episodesNotifier: context.read<EpisodesNotifier>(),
+            appConfig: config,
           ),
         ),
       ],
